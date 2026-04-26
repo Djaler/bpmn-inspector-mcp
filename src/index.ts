@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { copyFile, mkdir } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { renderBpmn } from "./tools/render.js";
 import { validateLayout } from "./tools/validate-layout.js";
@@ -15,7 +18,8 @@ server.registerTool("render_bpmn", {
   title: "Render BPMN Diagram",
   description:
     "Renders a BPMN file to a PNG image using the same engine as Camunda Modeler. " +
-    "Use to visually inspect diagram layout and verify element positioning.",
+    "Use to visually inspect diagram layout and verify element positioning. " +
+    "For a complete check, combine with validate_bpmn_layout — visual inspection alone may miss structural issues.",
   annotations: {
     readOnlyHint: true,
     destructiveHint: false,
@@ -38,7 +42,9 @@ server.registerTool("validate_bpmn_layout", {
   description:
     "Analyzes the visual layout of a BPMN diagram and reports issues: " +
     "overlapping elements, insufficient spacing, flows crossing through elements, " +
-    "out-of-bounds elements, label collisions.",
+    "out-of-bounds elements, label collisions, duplicate data associations, " +
+    "and excessive gaps between connected elements. " +
+    "After modifying a BPMN file, always run this tool to check for structural issues.",
   annotations: {
     readOnlyHint: true,
     destructiveHint: false,
@@ -57,6 +63,10 @@ server.registerTool("validate_bpmn_layout", {
           .number()
           .optional()
           .describe("Pixel tolerance for overlap detection (default: 0)"),
+        maxGap: z
+          .number()
+          .optional()
+          .describe("Maximum gap between connected elements in pixels before warning (default: 300)"),
       })
       .optional()
       .describe("Override default validation thresholds"),
@@ -79,7 +89,26 @@ async function main(): Promise<void> {
   await server.connect(transport);
 }
 
-main().catch((err) => {
-  console.error("Fatal error:", err);
-  process.exit(1);
-});
+async function installSkill(): Promise<void> {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const sourcePath = join(__dirname, "..", "skills", "bpmn-review.md");
+  const targetDir = join(process.cwd(), ".claude", "skills", "bpmn-review");
+  const targetPath = join(targetDir, "SKILL.md");
+
+  await mkdir(targetDir, { recursive: true });
+  await copyFile(sourcePath, targetPath);
+
+  console.log(`Installed bpmn-review skill to ${targetPath}`);
+}
+
+if (process.argv[2] === "install-skill") {
+  installSkill().catch((err) => {
+    console.error("Failed to install skill:", err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
+} else {
+  main().catch((err) => {
+    console.error("Fatal error:", err);
+    process.exit(1);
+  });
+}

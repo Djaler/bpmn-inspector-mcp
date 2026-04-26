@@ -32,7 +32,9 @@ export type IssueType =
   | "too_close"
   | "flow_crossing"
   | "out_of_bounds"
-  | "label_overlap";
+  | "label_overlap"
+  | "duplicate_connection"
+  | "excessive_gap";
 
 export interface ValidationIssue {
   type: IssueType;
@@ -52,11 +54,13 @@ export interface ValidationResult {
 export interface Thresholds {
   minSpacing: number;
   overlapTolerance: number;
+  maxGap: number;
 }
 
 export const DEFAULT_THRESHOLDS: Thresholds = {
   minSpacing: 30,
   overlapTolerance: 0,
+  maxGap: 300,
 };
 
 const CONTAINER_TYPES = new Set([

@@ -6,6 +6,8 @@ import { checkSpacing } from "../validator/rules/spacing.js";
 import { checkFlowCrossing } from "../validator/rules/flow-crossing.js";
 import { checkOutOfBounds } from "../validator/rules/out-of-bounds.js";
 import { checkLabelOverlap } from "../validator/rules/label-overlap.js";
+import { checkDuplicateAssociations } from "../validator/rules/duplicate-associations.js";
+import { checkExcessiveGap } from "../validator/rules/excessive-gap.js";
 
 export async function validateLayout(
   filePath: string,
@@ -26,6 +28,8 @@ export async function validateLayout(
       ...checkFlowCrossing(data),
       ...checkOutOfBounds(data),
       ...checkLabelOverlap(data),
+      ...checkDuplicateAssociations(data),
+      ...checkExcessiveGap(data, mergedThresholds),
     ];
 
     const errorCount = issues.filter(i => i.severity === "error").length;

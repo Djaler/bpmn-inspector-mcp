@@ -8,6 +8,7 @@ MCP server for visual inspection and layout validation of BPMN diagrams.
 - **MCP SDK**: `@modelcontextprotocol/sdk` (stdio transport)
 - **Rendering**: `bpmn-js` (browser lib, loaded in Puppeteer) + `puppeteer-core` (uses system Chrome)
 - **Validation**: `bpmn-moddle` (BPMN XML parser) + coordinate geometry
+- **Testing**: `vitest`
 - **Build**: `tsc` → `dist/`
 
 ## Architecture
@@ -30,8 +31,15 @@ src/
       flow-crossing.ts         — Flows crossing through unrelated elements
       out-of-bounds.ts         — Elements at negative coordinates
       label-overlap.ts         — Labels overlapping elements (with 5px shrink tolerance)
+      duplicate-associations.ts — Duplicate data associations between the same element pair
+      excessive-gap.ts         — Empty corridor between connected elements (post-refactoring gaps)
   utils/
     geometry.ts                — Rect intersection, containment, gap calculation, segment-rect tests
+skills/
+  bpmn-review.md               — Claude Code skill: auto-triggered BPMN review workflow
+test/
+  helpers.ts                   — Test factories: shape(), edge(), diagramData()
+  rules/                       — Per-rule test files
 ```
 
 ## Key Design Decisions
@@ -42,18 +50,32 @@ src/
 - **BoundaryEvent pairs on the same host are excluded** from both overlap and spacing checks — they naturally sit close together.
 - **Label bounds are shrunk by 5px** before overlap checks — DI label bounds are often larger than the rendered text.
 - **Overlap requires ≥50px² area** — filters out trivial edge-touching from imprecise DI bounds.
+- **Excessive gap uses "empty corridor" heuristic** — checks whether the horizontal space between connected elements contains any non-container shapes. A long flow bypassing other elements won't trigger because the corridor is occupied. Only flags genuinely empty gaps (e.g., after deleting an intermediate step).
 
 ## Building & Running
 
 ```bash
 npm install
 npm run build
+npm test              # run vitest
 node dist/index.js    # stdio MCP server
 ```
+
+## Installing the BPMN Review Skill
+
+To install the Claude Code skill into a project that uses this MCP server:
+
+```bash
+npx bpmn-inspector-mcp install-skill
+```
+
+This copies `skills/bpmn-review.md` to `.claude/skills/bpmn-review/SKILL.md` in the current directory.
 
 ## Adding a New Validation Rule
 
 1. Create `src/validator/rules/<rule-name>.ts`
 2. Export a function: `(data: DiagramData, ...) => ValidationIssue[]`
-3. Add it to the rule list in `src/tools/validate-layout.ts`
-4. Use `formatElement(id, name, type)` from `types.ts` for human-readable messages
+3. Add the new `IssueType` to `src/validator/types.ts`
+4. Add it to the rule list in `src/tools/validate-layout.ts`
+5. Add tests in `test/rules/<rule-name>.test.ts`
+6. Use `formatElement(id, name, type)` from `types.ts` for human-readable messages
