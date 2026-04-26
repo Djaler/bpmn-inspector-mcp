@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.mcp.json
+.idea/
+*.iml
+.DS_Store
+.claude/
+test/
