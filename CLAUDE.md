@@ -71,9 +71,15 @@ npx bpmn-inspector-mcp install-skill
 
 This copies `skills/bpmn-review.md` to `.claude/skills/bpmn-review/SKILL.md` in the current directory.
 
+## Changelog
+
+When implementing features or fixes, immediately add entries to `CHANGELOG.md` under the `[Unreleased]` section. Don't wait for a release.
+
 ## Releasing
 
-1. Update `CHANGELOG.md` — add a new `## [X.Y.Z] - YYYY-MM-DD` section under `[Unreleased]`
+Only release when explicitly requested by the user.
+
+1. Move `[Unreleased]` entries into a new `## [X.Y.Z] - YYYY-MM-DD` section
 2. Bump `version` in `package.json`
 3. Commit: `chore: release X.Y.Z`
 4. Create a git tag: `git tag vX.Y.Z`
