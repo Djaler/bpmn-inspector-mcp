@@ -73,6 +73,22 @@ Smart exclusions are built in:
 - Boundary events don't conflict with their host activity or each other on the same host
 - Pool-to-pool spacing is excluded (controlled by the modeler)
 
+## Updating
+
+If you use `npx -y`, it caches the package locally. To update to the latest version:
+
+```bash
+npx -y bpmn-inspector-mcp@latest
+```
+
+After updating, restart your MCP client to pick up the new version.
+
+If you installed the BPMN review skill into your project, re-run the install command to update it:
+
+```bash
+npx bpmn-inspector-mcp install-skill
+```
+
 ## Building from Source
 
 ```bash
