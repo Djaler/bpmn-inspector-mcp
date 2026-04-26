@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-26
+
+### Added
+
+- **duplicate_connection** (warning) — detects duplicate data associations or message flows between the same element pair (common after merging BPMN steps)
+- **excessive_gap** (warning) — detects empty horizontal corridors between connected elements with no shapes in between (common after removing intermediate steps)
+- `maxGap` threshold parameter for `validate_bpmn_layout` (default: 300px)
+- `bpmn-review` Claude Code skill — auto-triggered workflow that runs validation + visual inspection when working with BPMN files
+- `npx bpmn-inspector-mcp install-skill` CLI command — installs the skill into a project's `.claude/skills/` directory
+- Test infrastructure (vitest) with 13 tests covering both new rules
+
+### Changed
+
+- `validate_bpmn_layout` and `render_bpmn` tool descriptions now recommend running validation after BPMN modifications
+
 ## [0.1.0] - 2026-04-26
 
 ### Added
