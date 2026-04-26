@@ -22,7 +22,9 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Extract release notes from CHANGELOG
+        run: awk '/^## \['"$VERSION"'\]/{found=1; next} /^## \[/{if(found) exit} found{print}' CHANGELOG.md > /tmp/release-notes.md
       - name: Create GitHub Release
-        run: gh release create ${{ github.ref_name }} --generate-notes --title "v${{ env.VERSION }}"
+        run: gh release create ${{ github.ref_name }} --notes-file /tmp/release-notes.md --title "v${{ env.VERSION }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
