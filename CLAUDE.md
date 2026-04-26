@@ -71,6 +71,16 @@ npx bpmn-inspector-mcp install-skill
 
 This copies `skills/bpmn-review.md` to `.claude/skills/bpmn-review/SKILL.md` in the current directory.
 
+## Releasing
+
+1. Update `CHANGELOG.md` — add a new `## [X.Y.Z] - YYYY-MM-DD` section under `[Unreleased]`
+2. Bump `version` in `package.json`
+3. Commit: `chore: release X.Y.Z`
+4. Create a git tag: `git tag vX.Y.Z`
+5. Push both: `git push origin main vX.Y.Z`
+
+CI creates the GitHub Release automatically from the tag. Release notes are taken from `CHANGELOG.md`.
+
 ## Adding a New Validation Rule
 
 1. Create `src/validator/rules/<rule-name>.ts`
