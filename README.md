@@ -22,6 +22,14 @@ Add to your project's `.mcp.json`:
 
 Restart your MCP client (Claude Code, etc.).
 
+### BPMN Review Skill (Claude Code)
+
+The package includes a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) that automatically triggers BPMN layout validation and visual inspection whenever a `.bpmn` file is modified. To install it into your project:
+
+```bash
+npx bpmn-inspector-mcp install-skill
+```
+
 ## What It Does
 
 Ask your AI agent to inspect a BPMN diagram:
